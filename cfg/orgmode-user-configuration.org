@@ -10,6 +10,6 @@ Just loading this file here is maybe nice, but does not make too much sense beca
 ** Define the location of some central Org files
 
 #+BEGIN_SRC emacs-lisp
-    (setq org-default-notes-file "~/org/archedl/refile_ml.org")
-    (setq org-default-journal-file "~/org/personal/journal.org")
+    (setq org-default-notes-file "~/org/main/refile_ml.org")
+    (setq org-default-journal-file "~/org/user/journal.org")
 #+END_SRC

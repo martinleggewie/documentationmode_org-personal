@@ -1,0 +1,3 @@
+#+TITLE: ML's Org Mode journal file to contain information for user's eyes only
+#+OPTIONS: broken-links:t
+* JOURNAL                                                                  :REFILETARGET:
