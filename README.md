@@ -1,8 +1,8 @@
 
 
-# documentationmode_org-personal
+# documentationmode_org-user
 
-Org Mode folder to showcase the "Documentation Mode" which contains configuration and some demo data for personal use.
+Org Mode folder to showcase the "Documentation Mode" which contains configuration and some demo data specific for the user only.
 
 To get the whole Emacs and Org Mode configuration running without the need to change the concrete file paths, please clone this Git repo to your local file system to the path `$HOME/org/user`.
 So, use a command like this
