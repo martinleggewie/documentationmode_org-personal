@@ -8,7 +8,7 @@ To get the whole Emacs and Org Mode configuration running without the need to ch
 So, use a command like this
 
 ```
-git clone https://github.com/martinleggewie/documentationmode_org-main ~/org/user
+git clone https://github.com/martinleggewie/documentationmode_org-user ~/org/user
 ```
 
 For all details about how to use this and why it makes sense please check my [tutorial about how to set-up the documentation mode](https://martinleggewie.github.io/documentationmode/how-to-configure.html)
