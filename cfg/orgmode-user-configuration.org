@@ -13,3 +13,17 @@ Just loading this file here is maybe nice, but does not make too much sense beca
     (setq org-default-notes-file "~/org/main/refile_ml.org")
     (setq org-default-journal-file "~/org/user/journal.org")
 #+END_SRC
+
+
+** Define some font face attributes (mainly the colors)
+
+So far I didn't find a color theme which would please my eye.
+If you ask me, this whole color theme business feels strange to me.
+Apparently, I have another taste then the rest of the (Emacs) world when it comes to colors and other face attributes.
+After some painful investigation I have found some settings which would work with a **light** color scheme, for example with the one which is set as default.
+
+#+BEGIN_SRC emacs-lisp
+    (setq org-fontify-done-headline t)
+    (set-face-attribute 'org-headline-done nil  :foreground "dark blue" :weight 'bold)
+    (set-face-attribute 'org-level-2 nil        :foreground "dark blue" :weight 'bold)
+#+END_SRC
