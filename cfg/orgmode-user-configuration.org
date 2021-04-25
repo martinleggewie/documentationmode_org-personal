@@ -1,0 +1,15 @@
+#+TITLE: Martin's Org mode configuration, defined in an org-mode file
+
+
+* Martin's specific Org mode configuration
+
+The settings in this file are supposed to be loaded after some main or common Org mode configuration.
+Just loading this file here is maybe nice, but does not make too much sense because then the rest of Org mode would be just plain vanilla and most likely not useful.
+
+
+** Define the location of some central Org files
+
+#+BEGIN_SRC emacs-lisp
+    (setq org-default-notes-file "~/org/archedl/refile_ml.org")
+    (setq org-default-journal-file "~/org/personal/journal.org")
+#+END_SRC

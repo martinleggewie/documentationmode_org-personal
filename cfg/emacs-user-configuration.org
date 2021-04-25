@@ -1,0 +1,331 @@
+#+TITLE: Martin's Emacs configuration, defined in an org-mode file
+
+Let's get started!
+Several of the following configuration settings I have shamelessly taken from https://www.suenkler.info/notes/emacs-config and http://doc.norang.ca/org-mode.html.
+
+
+* Package management
+
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '(("melpa"     . "https://melpa.org/packages/")
+                         ("org"       . "http://orgmode.org/elpa/")
+                         ("gnu"       . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")))
+(package-initialize)
+#+END_SRC
+
+
+* Use package
+
+Normally, I avoid stuff when I have quite some trouble understanding what exactly the stuff does and how I could benefit from.
+I had this experience with the "use-package" package.
+The information provided on its Github homepage https://github.com/jwiegley/use-package did not really explain this.
+But, as far as I have understood it, use-package allows loading a package together with some configuration settings.
+By this you don't loose the overview so easily.
+Aha.
+So, I decided to give it a try (and also, use-package is used in the configuration I have found on https://www.suenkler.info/notes/emacs-config/).
+
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+END_SRC
+
+
+* Some basic settings
+
+Apparently, the Emacs people didn't manage to set Emacs up in a way that it feels at least a little bit being in the third millenium.
+In this section I define some basic settings that I consider as being mandatory.
+
+** No backup files, but non-polluting autosave
+
+Apparently, Emacs creates two types of backup files.
+Using file "bla.txt" as an example, Emacs would create the following two files, depending on the situation:
+- bla.txt.backup~
+- bla.txt.#autosave#
+
+With this following setting, Emacs will stop doing this.
+In addition, Emacs will autosave any changed file at the original file location after 1 second.
+As a consequence, you will never need to explicitely save a file anymore.
+
+#+BEGIN_SRC emacs-lisp
+(setq make-backup-files nil) ;; stop creating those backup~ files
+(setq auto-save-default nil) ;; stop creating those #autosave# files
+(setq auto-save-visited-interval 1) ;; autosave after 1 second of waiting time
+(auto-save-visited-mode) ;; but instead do autosave in the visited file
+#+END_SRC
+
+
+** Handle parantheses nicely
+
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode 1)
+#+END_SRC
+
+
+** Show current column number in status bar
+
+#+BEGIN_SRC emacs-lisp
+(column-number-mode t)
+#+END_SRC
+
+
+** Show current line number at the left side of the window
+
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode t)
+#+END_SRC
+
+
+** Save current Emacs session, reload it directly after launch
+
+#+BEGIN_SRC emacs-lisp
+(desktop-save-mode 1)
+#+END_SRC
+
+
+** Set font and its size
+
+#+BEGIN_SRC emacs-lisp
+(if (eq system-type 'windows-nt)
+    (add-to-list 'default-frame-alist '(font . "Consolas-12"))
+)
+(if (eq system-type 'darwin)
+    (set-face-attribute 'default nil :height 140)
+)
+#+END_SRC
+
+
+** Enable usable meta key on MacOS
+
+The following setting takes care that on MacOS you can use the left ALT key as meta key in Emacs.
+At the same time, you want to use the right ALT key to enter special characters like @ or ].
+To get that, you actually need to disable the right key for Emacs so that MacOS has a chance to get a hold of the right ALT key.
+And this is what the following configuration really does.
+
+#+BEGIN_SRC emacs-lisp
+(if (eq system-type 'darwin)
+    (setq mac-right-option-modifier nil)
+)
+#+END_SRC
+
+
+** Hide the toolbar
+
+As an efficiency-driven person you of course want to have as much screen estate available at your disposal as possible.
+Therefore, you want to not use the stupid and ugly toolbar.
+Emacs is anyways only really usable when learning all the keyboard shortcuts.
+By the way: For some strange reason the Lisp command "(tool-bar-mode nil)" did not work, at least not on my MacBook wit MacOS Catalina.
+I needed to use "(tool-bar-mode -1)".
+
+#+BEGIN_SRC emacs-lisp
+(if window-system
+    (tool-bar-mode -1)
+)
+#+END_SRC
+
+
+** Enable line wrapping at word level
+
+#+BEGIN_SRC emacs-lisp
+;;(setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+(setq visual-line-fringe-indicators '(nil right-curly-arrow))
+(global-visual-line-mode 1)
+#+END_SRC
+
+
+** Delete selected text when entering other keys
+
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
+#+END_SRC
+
+
+** "y" instead of "yes"
+
+Sometimes Emacs wants you to type the word "yes" (or "no") in the minibuffer when you are about to do something dangerous.
+As I trust in my abilities, I re-define this so that a simple "y" or "n" is sufficient.
+
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+
+** Buffer menu in current buffer and directly at hands
+
+Another one of these strange default settings in Emacs:
+When showing the list of all currently opened buffers, the list appears in another window, while the focus lays still on the current window.
+That means that you need to first switch to the other window before you can select an entry of the buffer list.
+The following setting changes that: When pressing "C-x C-b", the list of open buffers appears in the current window, and no window is opened.
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-b") 'buffer-menu)
+#+END_SRC
+
+
+** Give some help with the shortcuts (which-key)
+
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :ensure t 
+  :config
+  (which-key-mode))
+#+END_SRC
+
+
+** Highlight current line
+
+I find it very helpful when the editor highlights the current line (the line where the cursor currently is located).
+
+#+BEGIN_SRC emacs-lisp
+(global-hl-line-mode t)
+(set-face-background 'hl-line "gray93")
+#+END_SRC
+
+
+** Enable easy to be used shortcuts for moving and duplicating lines
+
+Again, I can only scratch my head, not believing that Emacs is not configured out of the box with an easy way to move whole lines up and down.
+But since I am going to use Emacs only when handling Org files, and since Org comes with a feature to move lines up and down (S-M-Up and S-M-Down), I can live with that outside Org files there is no support for moving lines around.
+In case I need this, I can bind the functions below to a keyboard shortcut of my liking.
+
+#+BEGIN_SRC emacs-lisp
+(defun martin-move-line-up ()
+  (interactive)
+  (transpose-lines 1)
+  (forward-line -2))
+
+(defun martin-move-line-down ()
+  (interactive)
+  (forward-line 1)
+  (transpose-lines 1)
+  (forward-line -1))
+
+;(global-set-key (kbd "M-<up>") 'martin-move-line-up)
+;(global-set-key (kbd "M-<down>") 'martin-move-line-down)
+#+END_SRC
+
+But once I have accepted this, it did not hurt so much when I realized that there is also no such easy way for duplicating lines.
+Sigh.
+So we need some explicit configuration to get such a standard feature also in Emacs.
+It goes like this (kudos to https://rejeep.github.io/emacs/elisp/2010/03/11/duplicate-current-line-or-region-in-emacs.html for this configuration).
+
+#+BEGIN_SRC emacs-lisp
+(defun martin-duplicate-current-line-or-region (arg)
+  "Duplicates the current line or region ARG times.
+If there's no region, the current line will be duplicated. However, if
+there's a region, all lines that region covers will be duplicated."
+  (interactive "p")
+  (let (beg end (origin (point)))
+    (if (and mark-active (> (point) (mark)))
+        (exchange-point-and-mark))
+    (setq beg (line-beginning-position))
+    (if mark-active
+        (exchange-point-and-mark))
+    (setq end (line-end-position))
+    (let ((region (buffer-substring-no-properties beg end)))
+      (dotimes (i arg)
+        (goto-char end)
+        (newline)
+        (insert region)
+        (setq end (point)))
+      (goto-char (+ origin (* (length region) arg) arg)))))
+
+(global-set-key (kbd "S-C-M-<down>") 'martin-duplicate-current-line-or-region)
+#+END_SRC
+
+
+* Magit
+
+Of course you use Git repos all the time, don't you?
+Yes, of course you do.
+And therefore you need to use the Magit package ... and for some strange reason you also need to configure its most used keyboard shortcut explicitely.
+
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  :config (setq magit-display-buffer-function  ;; Make Magit Fullscreen
+                (lambda (buffer)
+                  (if magit-display-buffer-noselect
+                    ;; the code that called `magit-display-buffer-function'
+                    ;; expects the original window to stay alive, we can't go
+                    ;; fullscreen
+                    (magit-display-buffer-traditional buffer)
+                    (delete-other-windows)
+                    ;; make sure the window isn't dedicated, otherwise
+                    ;; `set-window-buffer' throws an error
+                    (set-window-dedicated-p nil nil)
+                    (set-window-buffer nil buffer)
+                    ;; return buffer's window
+                    (get-buffer-window buffer)))))
+                    
+(global-set-key (kbd "C-x g") 'magit-status)
+#+END_SRC
+
+
+* Neotree
+
+The neotree package shows a file browser as a new buffer window at the left side.
+Such a file browser can come in handy once in a while, especially if you are fed up enough to deal with always needing to switch to Dired.
+
+There are some useful keyboard commands while the neotree buffer is in focus:
+- "g": Refresh neotree window.
+- "A": Maximize the neotree window. Pressing "A" again will set the window back to its original size.
+- "H": Toggle showing hidden files and directories.
+- "C-c C-n": Create file or directory (if filename ends with a ‘/’).
+- "C-c C-d": Delete file or directory.
+- "C-c C-r": Rename file or directory.
+- "C-c C-p": Copy file or directory.
+- "C-c C-c": Change the root directory.
+
+#+BEGIN_SRC emacs-lisp
+(use-package neotree
+  :ensure t
+  :config (setq neo-window-width 40)
+          (setq neo-smart-open t)
+)
+
+(define-key global-map (kbd "<f1>") 'neotree-toggle)
+#+END_SRC
+
+
+* PowerLine
+
+Powerline puts a nicer looking status bar at the bottom of each buffer's window.
+Not sure if this is soo important, but at least it adds some eye-candy to Emacs.
+
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'powerline)
+  (package-refresh-contents)
+  (package-install 'powerline))
+(use-package powerline
+  :ensure t)
+(require 'powerline)
+(powerline-default-theme)
+#+END_SRC
+
+
+* Ido and Smex
+
+Apparently, Ido mode ("Interactively DO things") enhances the way of how you can find buffers by just typing some parts of the buffer's name.
+I think it can do many more magic stuff.
+I decided to give Ido a try after reading this article:
+https://www.masteringemacs.org/article/introduction-to-ido-mode
+
+#+BEGIN_SRC emacs-lisp
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
+#+END_SRC
+
+Now that we have Ido in place, we can enhance our Emacs experience even further by using Smex.
+Smex is an enhancement of the normal "M-x" to execute any Emacs command.
+
+#+BEGIN_SRC emacs-lisp
+(use-package smex
+  :ensure t
+  :bind (("M-x" . smex) ("M-X" . smex-major-mode-commands))
+  :config (smex-initialize))
+#+END_SRC
